@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CoinPal – Your Crypto Copilot</title>
+    <script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@3/dist/index.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #0e101c;
+            color: #fff;
+        }
+
+        .app {
+            max-width: 800px;
+            margin: auto;
+            padding: 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            margin-bottom: 0.2rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tabs button {
+            padding: 0.6rem 1rem;
+            background: #1e2238;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .tabs button:hover {
+            background: #32395b;
+        }
+
+        .tab {
+            display: none;
+            background: #1e2238;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .chatbot {
+            background: #1e2238;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        #chat-log {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 0.5rem;
+        }
+
+        #chat-log div {
+            background: #2a2e4a;
+            margin: 0.3rem 0;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+
+        #chat-input {
+            width: 100%;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 6px;
+            background: #2a2e4a;
+            color: white;
+        }
+
+        .wallet-button {
+            background: #0052ff;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .wallet-button:hover {
+            background: #0043d4;
+        }
+
+        .wallet-info {
+            background: #1e2238;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .wallet-info.active {
+            display: block;
+        }
+
+        .feature-card {
+            background: #2a2e4a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-card h3 .emoji {
+            margin-right: 0.5rem;
+        }
+
+        .feature-card .status {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .status-complete {
+            background: #28a745;
+        }
+
+        .status-partial {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-pending {
+            background: #dc3545;
+        }
+
+        .action-button {
+            background: #0052ff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .action-button:hover {
+            background: #0043d4;
+        }
+
+        .security-checklist {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .security-checklist li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .security-checklist li:before {
+            content: "☐";
+            margin-right: 0.5rem;
+        }
+
+        .security-checklist li.checked:before {
+            content: "☑";
+            color: #28a745;
+        }
+
+        .altcoin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .altcoin-item {
+            background: #2a2e4a;
+            padding: 0.5rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .altcoin-item img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-banner {
+            background: #ffc107;
+            color: #000;
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .location-banner.active {
+            display: block;
+        }
+
+        .kyc-steps {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .kyc-steps li {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .kyc-steps li:before {
+            content: "1";
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #0052ff;
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kyc-steps li:nth-child(2):before {
+            content: "2";
+        }
+
+        .kyc-steps li:nth-child(3):before {
+            content: "3";
+        }
+
+        .kyc-steps li:nth-child(4):before {
+            content: "4";
+        }
+
+        .kyc-steps li:nth-child(5):before {
+            content: "5";
+        }
+
+        .transaction-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid #3a3e5a;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+        }
+
+        .transaction-amount.positive {
+            color: #28a745;
+        }
+
+        .transaction-amount.negative {
+            color: #dc3545;
+        }
+
+        .support-ticket {
+            background: #2a2e4a;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .support-ticket h4 {
+            margin-top: 0;
+        }
+
+        .support-ticket .status {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .support-ticket .status.open {
+            background: #dc3545;
+        }
+
+        .support-ticket .status.in-progress {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .support-ticket .status.resolved {
+            background: #28a745;
+        }
+
+        .wallet-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .wallet-type {
+            background: #2a2e4a;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .wallet-type h4 {
+            margin-top: 0;
+        }
+
+        .wallet-type ul {
+            padding-left: 1.5rem;
+        }
+
+        .security-score {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .security-score .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .security-score .score.high {
+            color: #28a745;
+        }
+
+        .security-score .score.medium {
+            color: #ffc107;
+        }
+
+        .security-score .score.low {
+            color: #dc3545;
+        }
+
+        .security-score .recommendations {
+            flex: 1;
+        }
+
+        .security-score .recommendations h5 {
+            margin-top: 0;
+        }
+
+        .security-score .recommendations ul {
+            margin-top: 0.5rem;
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <h1>🧠 CoinPal</h1>
+            <p>Your AI Assistant for Coinbase</p>
+        </header>
+
+        <button id="connectWallet" class="wallet-button">Connect Coinbase Wallet</button>
+        <div id="walletInfo" class="wallet-info">
+            <p>Connected Wallet: <span id="walletAddress"></span></p>
+        </div>
+
+        <div id="locationBanner" class="location-banner">
+            <p>⚠️ We've detected you're in a region with limited Coinbase availability. Our AI can help you navigate local regulations and find workarounds.</p>
+        </div>
+
+        <nav class="tabs">
+            <button onclick="switchTab('fees')">Fee Analyzer</button>
+            <button onclick="switchTab('altcoins')">Altcoin Explorer</button>
+            <button onclick="switchTab('kyc')">KYC Guide</button>
+            <button onclick="switchTab('fraud')">Fraud Alert</button>
+            <button onclick="switchTab('support')">Support AI</button>
+            <button onclick="switchTab('wallet')">Own Your Keys</button>
+            <button onclick="switchTab('security')">Security Check</button>
+            <button onclick="switchTab('portfolio')">Portfolio Insights</button>
+            <button onclick="switchTab('education')">Education Hub</button>
+        </nav>
+
+        <section id="fees" class="tab active">
+            <h2>Fee Analyzer</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">🔺</span> High Fees <span class="status status-complete">Solved</span></h3>
+                <p>Our AI analyzes your transaction history and recommends cheaper alternatives.</p>
+                <div class="transaction-history">
+                    <div class="transaction-item">
+                        <div>BTC Purchase</div>
+                        <div class="transaction-amount negative">-$50.00 (3.5%)</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div>ETH Transfer</div>
+                        <div class="transaction-amount negative">-$15.00 (1.2%)</div>
+                    </div>
+                </div>
+                <p><strong>Recommendation:</strong> Use Coinbase Pro for lower fees (0.6% vs 3.5%). Your last transaction could have saved $41.00.</p>
+                <button class="action-button">View Fee Comparison</button>
+            </div>
+        </section>
+
+        <section id="altcoins" class="tab">
+            <h2>Altcoin Explorer</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">❌</span> Limited Altcoins <span class="status status-partial">Partially Addressed</span></h3>
+                <p>While we can't add tokens to Coinbase directly, we can recommend platforms with your desired altcoins and guide you on safe transfers.</p>
+                <div class="altcoin-grid">
+                    <div class="altcoin-item">
+                        <img src="https://cryptologos.cc/logos/polkadot-dot-logo.png" alt="DOT">
+                        <div>Polkadot</div>
+                    </div>
+                    <div class="altcoin-item">
+                        <img src="https://cryptologos.cc/logos/cardano-ada-logo.png" alt="ADA">
+                        <div>Cardano</div>
+                    </div>
+                    <div class="altcoin-item">
+                        <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="SOL">
+                        <div>Solana</div>
+                    </div>
+                    <div class="altcoin-item">
+                        <img src="https://cryptologos.cc/logos/chainlink-link-logo.png" alt="LINK">
+                        <div>Chainlink</div>
+                    </div>
+                </div>
+                <p><strong>Available on:</strong> Binance, Kraken, KuCoin</p>
+                <button class="action-button">Find Best Exchange</button>
+            </div>
+        </section>
+
+        <section id="kyc" class="tab">
+            <h2>KYC Guide</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">🕵️</span> Strict KYC & Surveillance <span class="status status-complete">Solved</span></h3>
+                <p>We explain why KYC steps are needed, what's being tracked, and offer privacy education to increase your trust and clarity.</p>
+                <ol class="kyc-steps">
+                    <li><strong>Identity Verification:</strong> Required by law to prevent fraud and money laundering.</li>
+                    <li><strong>Document Upload:</strong> Your documents are encrypted and stored securely.</li>
+                    <li><strong>Selfie Verification:</strong> Ensures the person submitting documents is the account owner.</li>
+                    <li><strong>Address Verification:</strong> Confirms your residential address for regulatory compliance.</li>
+                    <li><strong>Transaction Monitoring:</strong> Helps protect you from suspicious activities.</li>
+                </ol>
+                <button class="action-button">Learn More About Privacy</button>
+            </div>
+        </section>
+
+        <section id="fraud" class="tab">
+            <h2>Fraud Alert</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">🧊</span> Freezing & Account Closures <span class="status status-complete">Solved</span></h3>
+                <p>Our Fraud Alert AI warns you of risky patterns and recommends preventive steps to avoid account freezes.</p>
+                <div class="security-checklist">
+                    <li class="checked">Large transfers detected (over $10,000)</li>
+                    <li class="checked">Multiple transactions in short time</li>
+                    <li>Unusual login locations</li>
+                    <li class="checked">New withdrawal addresses</li>
+                </div>
+                <p><strong>Recommendations:</strong></p>
+                <ul>
+                    <li>Split large transactions into smaller amounts</li>
+                    <li>Verify your identity early to avoid delays</li>
+                    <li>Use whitelisted addresses for withdrawals</li>
+                </ul>
+                <button class="action-button">Run Security Check</button>
+            </div>
+        </section>
+
+        <section id="support" class="tab">
+            <h2>Support AI</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">📞</span> Customer Support Issues <span class="status status-complete">Solved</span></h3>
+                <p>CoinPal becomes an AI-first support layer, explaining transactions, delays, and actions you can take—without waiting for human help.</p>
+                <div class="support-ticket">
+                    <h4>Transaction #TX123456 <span class="status status-in-progress">In Progress</span></h4>
+                    <p><strong>Issue:</strong> ETH withdrawal pending for 24 hours</p>
+                    <p><strong>AI Diagnosis:</strong> Network congestion on Ethereum blockchain. Expected resolution: 2-4 hours.</p>
+                    <p><strong>Action:</strong> No action needed. Your transaction is queued and will process automatically.</p>
+                </div>
+                <div class="support-ticket">
+                    <h4>Account Verification <span class="status status-resolved">Resolved</span></h4>
+                    <p><strong>Issue:</strong> ID verification failed</p>
+                    <p><strong>AI Diagnosis:</strong> Blurry image submitted. New submission required.</p>
+                    <p><strong>Action:</strong> Resubmit with clearer image in good lighting.</p>
+                </div>
+                <button class="action-button">Create Support Ticket</button>
+            </div>
+        </section>
+
+        <section id="wallet" class="tab">
+            <h2>Own Your Keys</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">🏦</span> Custodial Wallet (No Control Over Keys) <span class="status status-complete">Solved</span></h3>
+                <p>"Own Your Keys" Mode educates and helps you safely transfer funds to non-custodial wallets like Coinbase Wallet or MetaMask.</p>
+                <div class="wallet-comparison">
+                    <div class="wallet-type">
+                        <h4>Custodial (Coinbase)</h4>
+                        <ul>
+                            <li>Coinbase holds your private keys</li>
+                            <li>Easier to use</li>
+                            <li>Less secure</li>
+                            <li>Limited control</li>
+                        </ul>
+                    </div>
+                    <div class="wallet-type">
+                        <h4>Non-Custodial (Coinbase Wallet)</h4>
+                        <ul>
+                            <li>You control your private keys</li>
+                            <li>More secure</li>
+                            <li>Full control</li>
+                            <li>More responsibility</li>
+                        </ul>
+                    </div>
+                </div>
+                <button class="action-button">Transfer to Non-Custodial Wallet</button>
+            </div>
+        </section>
+
+        <section id="security" class="tab">
+            <h2>Security Check</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">🔐</span> Security Breaches & Risks <span class="status status-complete">Solved</span></h3>
+                <p>We educate you about wallet safety, 2FA, SIM swap risk, phishing, and run security checkups to alert you of risky actions.</p>
+                <div class="security-score">
+                    <div class="score high">85</div>
+                    <div class="recommendations">
+                        <h5>Security Recommendations:</h5>
+                        <ul>
+                            <li>Enable 2FA with authenticator app (not SMS)</li>
+                            <li>Use a hardware wallet for large holdings</li>
+                            <li>Check for suspicious login attempts</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="security-checklist">
+                    <li class="checked">Strong password</li>
+                    <li class="checked">2FA enabled</li>
+                    <li>Hardware wallet</li>
+                    <li class="checked">Email notifications</li>
+                    <li>Whitelisted addresses</li>
+                </div>
+                <button class="action-button">Run Full Security Audit</button>
+            </div>
+        </section>
+
+        <section id="portfolio" class="tab">
+            <h2>Portfolio Insights</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">🔧</span> Limited Advanced Tools <span class="status status-complete">Solved</span></h3>
+                <p>We add smart analytics and AI-powered insights beyond what standard Coinbase provides. Think of it as "Advanced Trade for everyone."</p>
+                <p>Your BTC holdings are over 60% of your portfolio. Consider diversifying.</p>
+                <div class="transaction-history">
+                    <div class="transaction-item">
+                        <div>BTC</div>
+                        <div class="transaction-amount positive">60%</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div>ETH</div>
+                        <div class="transaction-amount positive">25%</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div>Other</div>
+                        <div class="transaction-amount positive">15%</div>
+                    </div>
+                </div>
+                <button class="action-button">View Portfolio Analysis</button>
+            </div>
+        </section>
+
+        <section id="education" class="tab">
+            <h2>Education Hub</h2>
+            <div class="feature-card">
+                <h3><span class="emoji">📚</span> Crypto Education <span class="status status-complete">Solved</span></h3>
+                <p>Understand custodial vs non-custodial wallets, SIM swap risks, and how to secure your funds.</p>
+                <ul>
+                    <li><strong>Custodial vs Non-Custodial:</strong> Learn the differences and when to use each</li>
+                    <li><strong>SIM Swap Protection:</strong> How to prevent this common attack vector</li>
+                    <li><strong>Private Key Security:</strong> Best practices for storing your keys</li>
+                    <li><strong>Transaction Privacy:</strong> How to maintain privacy while using crypto</li>
+                </ul>
+                <button class="action-button">Start Learning</button>
+            </div>
+        </section>
+
+        <section class="chatbot">
+            <h3>Ask CoinPal AI</h3>
+            <div id="chat-log"></div>
+            <input type="text" id="chat-input" placeholder="Ask something..." onkeydown="handleChat(event)" />
+        </section>
+    </div>
+
+    <script>
+        let walletAddress = null;
+        const CoinbaseWalletSDK = window.CoinbaseWalletSDK;
+
+        // Simulate location detection
+        const restrictedLocations = ['China', 'Iran', 'North Korea', 'Cuba', 'Syria'];
+        const userLocation = 'United States'; // This would be detected in a real app
+        
+        if (restrictedLocations.includes(userLocation)) {
+            document.getElementById('locationBanner').classList.add('active');
+        }
+
+        async function connectWallet() {
+            try {
+                const coinbaseWallet = new CoinbaseWalletSDK({
+                    appName: "CoinPal",
+                    appLogoUrl: "https://your-logo-url.png",
+                    darkMode: true
+                });
+
+                const ethereum = coinbaseWallet.makeWeb3Provider();
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                
+                if (accounts.length > 0) {
+                    walletAddress = accounts[0];
+                    document.getElementById('walletAddress').textContent = 
+                        walletAddress.substring(0, 6) + '...' + walletAddress.substring(38);
+                    document.getElementById('walletInfo').classList.add('active');
+                    document.getElementById('connectWallet').textContent = 'Wallet Connected';
+                    document.getElementById('connectWallet').disabled = true;
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Failed to connect wallet. Please try again.');
+            }
+        }
+
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function handleChat(event) {
+            if (event.key === "Enter") {
+                const input = document.getElementById("chat-input");
+                const log = document.getElementById("chat-log");
+                const userText = input.value;
+                if (!userText.trim()) return;
+
+                const userMsg = document.createElement("div");
+                userMsg.textContent = "🧑‍💻 " + userText;
+                log.appendChild(userMsg);
+
+                const botMsg = document.createElement("div");
+                botMsg.textContent = "🤖 Thinking...";
+                log.appendChild(botMsg);
+
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: userText,
+                            wallet_address: walletAddress
+                        })
+                    });
+
+                    const data = await response.json();
+                    botMsg.textContent = "🤖 " + data.response;
+                } catch (error) {
+                    console.error('Error:', error);
+                    botMsg.textContent = "🤖 Sorry, I encountered an error. Please try again.";
+                }
+
+                input.value = "";
+                log.scrollTop = log.scrollHeight;
+            }
+        }
+
+        // Add event listeners for action buttons
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.textContent;
+                const log = document.getElementById("chat-log");
+                
+                const userMsg = document.createElement("div");
+                userMsg.textContent = "🧑‍💻 " + action;
+                log.appendChild(userMsg);
+
+                const botMsg = document.createElement("div");
+                botMsg.textContent = "🤖 Processing your request...";
+                log.appendChild(botMsg);
+
+                // Simulate AI response
+                setTimeout(() => {
+                    botMsg.textContent = "🤖 I've processed your request for " + action.toLowerCase() + ". How can I help you further?";
+                    log.scrollTop = log.scrollHeight;
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html> 
