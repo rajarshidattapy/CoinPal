@@ -134,13 +134,6 @@ The backend provides the following API endpoints:
 - **AI**: OpenRouter API
 - **Blockchain**: Coinbase Wallet SDK
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Disclaimer
 
