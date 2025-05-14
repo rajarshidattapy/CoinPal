@@ -15,6 +15,8 @@ import {
   EthBalance,
 } from "@coinbase/onchainkit/identity";
 import Locations from "./components/Locations";
+import Upload from "./components/Upload";
+import ChatBot from "./components/ChatBot";
 
 export default function App() {
   return (
@@ -49,7 +51,9 @@ export default function App() {
         </div>
       </header>
       <div className="flex items-center">
-        <Locations />
+        {/* <Locations />
+        <Upload /> */}
+        <ChatBot />
       </div>
     </div>
   );
