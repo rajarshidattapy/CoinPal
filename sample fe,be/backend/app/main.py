@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import json
 import random
 from datetime import datetime, timedelta
+from requests import get
 
 load_dotenv()
 
@@ -127,9 +128,17 @@ async def connect_wallet(wallet_address: str):
 
 @app.post("/api/check-location")
 async def check_location(request: LocationRequest):
-    # In a real app, you would use the IP address to determine location
-    # For demo purposes, we'll just return a mock response
-    country = request.country or "United States"
+    ip = get('https://api.ipify.org').text
+
+    response = get(f"http://ip-api.com/json/{ip}")
+    data = response.json()
+
+    region_name = data.get("regionName", "Unknown region")
+
+    print("Region:", region_name)
+    # country = request.country or "United States"
+    country = data.get("country","")
+    
     is_restricted = country in RESTRICTED_LOCATIONS
     
     return {
