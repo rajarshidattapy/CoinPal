@@ -14,6 +14,7 @@ import {
   Identity,
   EthBalance,
 } from "@coinbase/onchainkit/identity";
+import Kyc from "./components/Kyc";
 
 export default function App() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
             </Wallet>
           </div>
         </div>
+        <Kyc />
       </header>
     </div>
   );
