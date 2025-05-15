@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useUpload } from "../context/Context";
 
 export default function Upload() {
   const [file, setFile] = useState(null);
-  const [url, setUrl] = useState("");
+  // const [url, setUrl] = useState("");
   const [uploading, setUploading] = useState(false);
-
+  const { setUploadUrl, uploadUrl } = useUpload();
   const inputFile = useRef(null);
 
   const uploadFile = async () => {
@@ -29,11 +30,9 @@ export default function Upload() {
       }
 
       const response = await uploadRequest.json();
-      console.log("Response:", response);
+      // console.log("Response:", response);
 
-      if (response.url) {
-        setUrl(response.url);
-      }
+      setUploadUrl(response.url);
       setUploading(false);
     } catch (error) {
       console.error(error);
@@ -48,18 +47,32 @@ export default function Upload() {
   };
 
   return (
-    <main className="max-w-[500px] min-h-screen m-auto flex flex-col gap-4 justify-center items-center">
-      <input type="file" id="file" ref={inputFile} onChange={handleChange} />
+    <main className="w-full flex flex-col items-start gap-2 p-4 bg-gray-800 rounded-lg border border-gray-700">
+      <label htmlFor="file" className="text-sm text-gray-300 mb-1">
+        Upload Document:
+      </label>
+      <input
+        type="file"
+        id="file"
+        ref={inputFile}
+        onChange={handleChange}
+        className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+      />
       <button
-        className="bg-white text-black p-2 rounded-md"
+        className="bg-blue-600 text-white px-4 py-2 mt-2 rounded-lg hover:bg-blue-700 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={uploading}
         onClick={uploadFile}
       >
         {uploading ? "Uploading..." : "Upload"}
       </button>
-      {url && (
-        <a href={url} className="underline" target="_blank">
-          {url}
+      {uploadUrl && (
+        <a
+          href={uploadUrl}
+          className="mt-2 text-blue-500 underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View Uploaded File
         </a>
       )}
     </main>

@@ -17,6 +17,7 @@ import {
 import Locations from "./components/Locations";
 import Upload from "./components/Upload";
 import ChatBot from "./components/ChatBot";
+import KycGuide from "./components/KycGuide";
 
 export default function App() {
   return (
@@ -51,9 +52,10 @@ export default function App() {
         </div>
       </header>
       <div className="flex items-center">
-        {/* <Locations />
-        <Upload /> */}
-        <ChatBot />
+        {/* <Locations />*/}
+        {/* <Upload /> */}
+        {/* <ChatBot /> */}
+        <KycGuide />
       </div>
     </div>
   );
