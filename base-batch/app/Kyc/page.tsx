@@ -5,7 +5,7 @@ import { useUpload } from "../context/Context";
 import axios from "axios";
 import Locations from "../components/Locations";
 
-const KycGuide = () => {
+const Kyc = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -106,4 +106,4 @@ const KycGuide = () => {
   );
 };
 
-export default KycGuide;
+export default Kyc;
