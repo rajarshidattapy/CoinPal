@@ -14,9 +14,7 @@ import {
   Identity,
   EthBalance,
 } from "@coinbase/onchainkit/identity";
-import Locations from "./components/Locations";
-import Upload from "./components/Upload";
-import ChatBot from "./components/ChatBot";
+import Kyc from "./components/Kyc";
 
 export default function App() {
   return (
@@ -49,12 +47,8 @@ export default function App() {
             </Wallet>
           </div>
         </div>
+        <Kyc />
       </header>
-      <div className="flex items-center">
-        {/* <Locations />
-        <Upload /> */}
-        <ChatBot />
-      </div>
     </div>
   );
 }
