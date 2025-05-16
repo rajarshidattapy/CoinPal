@@ -1,0 +1,63 @@
+{
+    "user_001": {
+        "user_id": "user_001",
+        "wallet_address": "mock_wallet_001",
+        "assets": [
+            {
+                "asset_id": "BTC",
+                "name": "Bitcoin",
+                "quantity": 0.5,
+                "average_buy_price": 30000
+            },
+            {
+                "asset_id": "ETH",
+                "name": "Ethereum",
+                "quantity": 10,
+                "average_buy_price": 2000
+            }
+        ],
+        "cash_balance": 1000.00,
+        "last_updated": "2023-10-26T10:00:00Z",
+        "historical_summary": {
+            "7d_change_percent": 2.5,
+            "30d_change_percent": 5.1,
+            "ytd_pnl": 1500.75
+        },
+        "historical_performance_metrics": {
+            "24h_change_percent": 1.5,
+            "7d_change_percent": 2.5,
+            "30d_change_percent": 5.1,
+            "90d_change_percent": 10.2,
+            "ytd_pnl": 1500.75
+        },
+        "market_sentiment": {
+            "score": 0.7,
+            "sentiment": "Bullish",
+            "timestamp": "2024-05-16T10:30:00Z"
+        }
+    },
+    "user_002": {
+        "user_id": "user_002",
+        "assets": [
+            {
+                "asset_id": "SOL",
+                "name": "Solana",
+                "quantity": 100,
+                "average_buy_price": 20
+            },
+            {
+                "asset_id": "ADA",
+                "name": "Cardano",
+                "quantity": 500,
+                "average_buy_price": 0.30
+            }
+        ],
+        "cash_balance": 500.00,
+        "last_updated": "2023-10-26T11:00:00Z",
+        "historical_summary": {
+            "7d_change_percent": -1.2,
+            "30d_change_percent": 10.8,
+            "ytd_pnl": -50.20
+        }
+    }
+}
