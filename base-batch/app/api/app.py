@@ -4,13 +4,86 @@ import requests
 from requests import get
 import collections
 import os
-import json
+import sys
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import random
 import pymongo
-load_dotenv()
+from datetime import datetime
+
+# Add mock_portfolio_insights paths
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+src_path = os.path.abspath(os.path.join(project_root, 'mock_portfolio_insights', 'src'))
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+    print(f"INFO: Added {src_path} to sys.path")
+
+# Import crypto_portfolio_tool modules and config
+import crypto_portfolio_tool.config as portfolio_tool_config
+from crypto_portfolio_tool.core.models import Portfolio
+# In base-batch/app/api/app.py
+# After sys.path manipulation
+
+try:
+    from crypto_portfolio_tool.core.exceptions import APIRequestError, LogicError, DataValidationError # << CORRECTED
+    # ... other crypto_portfolio_tool imports ...
+    print("INFO (app.py): Successfully imported all crypto_portfolio_tool modules.")
+except ImportError as e:
+    # ...
+    raise
+from crypto_portfolio_tool.portfolio_insights.recommendations import RecommendationEngine
+from crypto_portfolio_tool.api_clients.portfolio_api import PortfolioAPIClient
+from crypto_portfolio_tool.api_clients.market_data_api import MarketDataAPIClient
+from crypto_portfolio_tool.api_clients.asset_news_api import AssetNewsAPIClient
+from crypto_portfolio_tool.api_clients.llm_client import LLMInsightsClient
+from crypto_portfolio_tool.portfolio_insights.analyzer import PortfolioAnalyzer
+     
+# Load environment variables
+load_dotenv(os.path.join(project_root, 'mock_portfolio_insights', '.env'))
+
+# Initialize configuration with defaults
+if not hasattr(portfolio_tool_config, 'MOCK_PORTFOLIO_SERVICE_BASE_URL'):
+    portfolio_tool_config.MOCK_PORTFOLIO_SERVICE_BASE_URL = os.getenv('MOCK_PORTFOLIO_SERVICE_BASE_URL', 'http://localhost:5001')
+if not hasattr(portfolio_tool_config, 'MOCK_MARKET_DATA_SERVICE_BASE_URL'):
+    portfolio_tool_config.MOCK_MARKET_DATA_SERVICE_BASE_URL = os.getenv('MOCK_MARKET_DATA_SERVICE_BASE_URL', 'http://localhost:5002')
+if not hasattr(portfolio_tool_config, 'MOCK_ASSET_NEWS_SERVICE_BASE_URL'):
+    portfolio_tool_config.MOCK_ASSET_NEWS_SERVICE_BASE_URL = os.getenv('MOCK_ASSET_NEWS_SERVICE_BASE_URL', 'http://localhost:5003')
+
+# Initialize API clients
+try:
+    portfolio_client_global = PortfolioAPIClient(
+        base_url=os.getenv('MOCK_PORTFOLIO_SERVICE_BASE_URL', 'http://localhost:5001')
+    )
+    market_client_global = MarketDataAPIClient(
+        base_url=os.getenv('MOCK_MARKET_DATA_SERVICE_BASE_URL', 'http://localhost:5002')
+    )
+    asset_news_client_global = AssetNewsAPIClient(
+        base_url=os.getenv('MOCK_ASSET_NEWS_SERVICE_BASE_URL', 'http://localhost:5003')
+    )
+
+    # Initialize LLM client if API key is available
+    llm_client_global = None
+    if os.getenv('OPENROUTER_API_KEY'):
+        llm_client_global = LLMInsightsClient(
+            api_key=os.getenv('OPENROUTER_API_KEY'),
+            default_model=os.getenv('OPENROUTER_DEFAULT_MODEL', 'gpt-3.5-turbo')
+        )
+    else:
+        print("WARNING: OPENROUTER_API_KEY not found. LLM features will be limited.")
+
+    # Initialize analyzers
+    analyzer_global = PortfolioAnalyzer(
+        portfolio_client=portfolio_client_global,
+        market_client=market_client_global,
+        asset_news_client=asset_news_client_global,
+        llm_client=llm_client_global
+    )
+    reco_engine_global = RecommendationEngine(llm_client=llm_client_global)
+
+except Exception as e:
+    print(f"Error initializing services: {str(e)}")
+    sys.exit(1)
 
 app = Flask(__name__)
 collections.Iterable = collections.abc.Iterable
@@ -371,29 +444,44 @@ async def security_check(request: SecurityCheckRequest):
         ]
     }
 
-@app.route("/api/portfolio-insights", methods=["POST"])
-async def portfolio_insights(wallet_address: Optional[str] = None):
-    # In a real app, you would analyze the user's portfolio
-    # For demo purposes, we'll return mock data
-    return {
-        "portfolio": MOCK_PORTFOLIO,
-        "recommendations": [
-            "Your BTC holdings are over 60% of your portfolio. Consider diversifying.",
-            "ETH has strong fundamentals and could be a good addition to your portfolio.",
-            "Consider adding some DeFi tokens for higher potential returns (with higher risk)."
-        ],
-        "market_insights": [
-            {"coin": "BTC", "sentiment": "Bullish", "reason": "Institutional adoption increasing"},
-            {"coin": "ETH", "sentiment": "Bullish", "reason": "Ethereum 2.0 upgrade complete"},
-            {"coin": "SOL", "sentiment": "Neutral", "reason": "Competition with other L1s"}
-        ],
-        "historical_performance": [
-            {"date": "2023-01-01", "value": 10000},
-            {"date": "2023-02-01", "value": 12000},
-            {"date": "2023-03-01", "value": 11000},
-            {"date": "2023-04-01", "value": 13000}
-        ]
-    }
+@app.route("/api/v1/portfolio/<string:wallet_address>/insights", methods=["GET"])
+def get_wallet_portfolio_insights(wallet_address: str):
+    try:
+        # Map wallet address to mock user ID for testing
+        user_mock_id = "user_001"
+        
+        # Get enriched portfolio data
+        enriched_portfolio = analyzer_global.get_enriched_portfolio(user_mock_id)
+        
+        response_data = {
+            "requested_wallet_address": wallet_address,
+            "mock_user_id": user_mock_id,
+            "portfolio_composition": {
+                "total_value": enriched_portfolio.total_value,
+                "assets": {
+                    asset_id: {
+                        "quantity": holding.quantity,
+                        "current_price": holding.current_price,
+                        "current_value": holding.current_value
+                    }
+                    for asset_id, holding in enriched_portfolio.assets.items()
+                }
+            },
+            "performance_metrics": {
+                "24h_change": 5.2,  # Mock data
+                "7d_change": -2.1,
+                "30d_change": 15.3
+            }
+        }
+        
+        return jsonify(response_data), 200
+
+    except Exception as e:
+        print(f"Error processing request: {str(e)}")
+        return jsonify({
+            "error": "Internal server error",
+            "detail": str(e)
+        }), 500
 
 @app.route("/api/education", methods=["POST"])
 async def education_resources():
@@ -440,4 +528,4 @@ async def education_resources():
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=3001)
+    app.run(debug=True, port=3001)
