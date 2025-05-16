@@ -1,0 +1,63 @@
+[
+    {
+        "intent": "greeting",
+        "keywords": [
+            "hello",
+            "hi",
+            "hey",
+            "greetings"
+        ],
+        "response": "Hello! I'm CoinPal, your crypto assistant. How can I help you today?"
+    },
+    {
+        "intent": "coinbase_transaction_delay",
+        "keywords": [
+            "transaction",
+            "delayed",
+            "stuck",
+            "pending",
+            "coinbase"
+        ],
+        "response": "Coinbase transactions can sometimes be delayed due to network congestion or internal processing. You can usually check the status on the Coinbase transaction history page. If it's been unusually long, consider contacting their support.",
+        "action": "guide_transaction_delay"
+    },
+    {
+        "intent": "account_verification",
+        "keywords": [
+            "account",
+            "verify",
+            "verification",
+            "identity",
+            "coinbase"
+        ],
+        "response": "Account verification issues can be tricky. Ensure your documents are clear and match your provided information. For Coinbase, you'd typically go to your account settings to check verification status or submit documents.",
+        "action": "guide_account_verification"
+    },
+    {
+        "intent": "portfolio_value_check",
+        "keywords": [
+            "portfolio",
+            "value",
+            "worth",
+            "how much"
+        ],
+        "response": "I can help you check your portfolio value. Which user ID are you asking about?",
+        "requires_user_context": true,
+        "action": "get_portfolio_summary"
+    },
+    {
+        "intent": "goodbye",
+        "keywords": [
+            "bye",
+            "goodbye",
+            "see you",
+            "later"
+        ],
+        "response": "Goodbye! Feel free to ask if you need anything else."
+    },
+    {
+        "intent": "fallback",
+        "keywords": [],
+        "response": "I'm sorry, I'm not sure how to help with that. Could you try rephrasing?"
+    }
+]

@@ -1,0 +1,73 @@
+{
+    "BTC": [
+      {
+        "id": "btc_news_1",
+        "headline": "Bitcoin Sees Bullish Momentum Above $45k!",
+        "sentiment_score": 0.75,
+        "sentiment_label": "positive",
+        "source": "CryptoUpdate",
+        "timestamp": "2023-11-10T10:00:00Z"
+      },
+      {
+        "id": "btc_news_2",
+        "headline": "Regulatory Concerns Cast Shadow on Bitcoin Short-Term",
+        "sentiment_score": -0.4,
+        "sentiment_label": "negative",
+        "source": "MarketWatch",
+        "timestamp": "2023-11-09T15:30:00Z"
+      },
+      {
+        "id": "btc_news_3",
+        "headline": "Bitcoin Network Congestion Raises Transaction Fees",
+        "sentiment_score": -0.6,
+        "sentiment_label": "negative",
+        "source": "BlockInsight",
+        "timestamp": "2023-11-08T08:15:00Z"
+      }
+    ],
+    "ETH": [
+      {
+        "id": "eth_news_1",
+        "headline": "Ethereum Upgrade 'XYZ' Successfully Deployed, Boosting Network Efficiency.",
+        "sentiment_score": 0.8,
+        "sentiment_label": "very_positive",
+        "source": "ETHNewsDaily",
+        "timestamp": "2023-11-10T09:00:00Z"
+      },
+      {
+        "id": "eth_news_2",
+        "headline": "Ethereum Shows Stability Despite Market Fluctuations",
+        "sentiment_score": 0.2,
+        "sentiment_label": "neutral",
+        "source": "CoinWorld",
+        "timestamp": "2023-11-09T14:00:00Z"
+      }
+    ],
+    "SOL": [
+      {
+        "id": "sol_news_1",
+        "headline": "Solana Ecosystem Fund Announces New Grants.",
+        "sentiment_score": 0.6,
+        "sentiment_label": "positive",
+        "source": "SolanaNews",
+        "timestamp": "2023-11-08T12:00:00Z"
+      },
+      {
+        "id": "sol_news_2",
+        "headline": "Solana Suffers Brief Outage Due to Validator Issue.",
+        "sentiment_score": -0.5,
+        "sentiment_label": "negative",
+        "source": "ChainReports",
+        "timestamp": "2023-11-07T16:20:00Z"
+      },
+      {
+        "id": "sol_news_3",
+        "headline": "Community Debates Solana’s Long-Term Viability Amid Rising Competition.",
+        "sentiment_score": -0.7,
+        "sentiment_label": "negative",
+        "source": "DeFiMirror",
+        "timestamp": "2023-11-06T11:10:00Z"
+      }
+    ]
+  }
+  
