@@ -1,0 +1,16 @@
+# For Mock APIs & Main App (if it becomes web-based)
+Flask==2.3.3
+# OR if you prefer FastAPI (choose one for mock services, can mix later)
+# fastapi==0.104.1
+# uvicorn[standard]==0.23.2
+# For HTTP requests from your main app to mock APIs
+requests==2.31.0
+
+# For data validation and settings management
+pydantic==2.4.2 # For data models
+python-dotenv==1.0.0 # For .env file loading
+
+# For Testing
+pytest==7.4.2
+pytest-mock==3.11.1
+requests-mock==1.11.0 # If using requests library directly in tests
