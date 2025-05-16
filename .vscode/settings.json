@@ -1,0 +1,7 @@
+// D:/Development/Projects/core/CoinPal/.vscode/settings.json
+{
+    "python.analysis.extraPaths": [
+        "./mock_portfolio_insights/src" // Path relative to workspace root
+    ],
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python" // Or your venv path
+}
