@@ -1,43 +1,49 @@
-"use client"; // Crucial for components that use hooks like useState, useEffect
-
+"use client"; 
 import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi'; // Or the equivalent hook from OnchainKit to get the connected address
-
-// Define TypeScript interfaces for the expected API response structure
-// These should ideally match the Pydantic models you'd define for your FastAPI response
-// or the structure of the JSON your Flask app returns.
+import { useAccount } from 'wagmi'; 
 
 interface AssetDetail {
-  asset_id: string;
-  name: string;
-  quantity: number;
-  current_price?: number;
-  current_value?: number;
-  percentage?: number;
-  cost_basis_total?: number;
-  unrealized_gain_loss_abs?: number;
-  unrealized_gain_loss_percent?: number;
+    asset_id: string;
+    name: string;
+    quantity: number;
+    current_price?: number;
+    current_value?: number;
+    percentage?: number;
+    cost_basis_total?: number;
+    unrealized_gain_loss_abs?: number;
+    unrealized_gain_loss_percent?: number;
 }
 
 interface CompositionDetails {
-  user_id: string; // Or might be implicit from the request
-  total_portfolio_value: number;
-  asset_composition: AssetDetail[];
-  cash_balance: number;
-  cash_percentage: number;
-  hhi_score?: number;
-  risk_metrics?: { // Match your RiskMetrics Pydantic model
-    portfolio_volatility_30d?: number;
-    portfolio_beta?: number;
-    var_95_confidence_1d?: number;
-  };
-  historical_performance?: { // Match your HistoricalPerformanceMetrics Pydantic model
-    "24h_change_percent"?: number; // Note: keys might need to be quoted if they have special chars
-    "7d_change_percent"?: number;
-    "30d_change_percent"?: number;
-    "90d_change_percent"?: number;
-    ytd_pnl?: number;
-  };
+    user_id: string;
+    total_portfolio_value: number;
+    asset_composition: AssetDetail[];
+    cash_balance: number;
+    cash_percentage: number;
+    hhi_score?: number;
+    risk_metrics?: {
+        portfolio_volatility_30d?: number;
+        portfolio_beta?: number;
+        var_95_confidence_1d?: number;
+    };
+}
+
+interface FullPortfolioInsightsResponse {
+    requested_wallet_address: string;
+    data_based_on_mock_user: string;
+    portfolio_composition: CompositionDetails;
+    historical_performance_summary?: {
+        "24h_change_percent"?: number;
+        "7d_change_percent"?: number;
+        "30d_change_percent"?: number;
+        ytd_pnl?: number;
+    };
+    investment_recommendations: string[];
+    global_market_sentiment?: {
+        score?: number;
+        sentiment?: string;
+    };
+    asset_specific_news: Record<string, AssetSpecificInsight>;
 }
 
 interface ProcessedNewsItem {
@@ -54,23 +60,6 @@ interface AssetSpecificInsight {
     error?: string | null;
 }
 
-interface FullPortfolioInsightsResponse {
-  requested_wallet_address: string;
-  data_based_on_mock_user: string; // From your Flask response
-  portfolio_composition: CompositionDetails; // The big dict from get_portfolio_composition
-  historical_performance_summary?: {
-    "24h_change_percent"?: number;
-    "7d_change_percent"?: number;
-    "30d_change_percent"?: number;
-    "90d_change_percent"?: number;
-    ytd_pnl?: number;
-  }; // Adjust if you renamed this in Flask response
-  investment_recommendations: string[];
-  global_market_sentiment?: { score?: number; sentiment?: string };
-  asset_specific_news: Record<string, AssetSpecificInsight>; // { "BTC": AssetSpecificInsight, ... }
-}
-
-
 export default function PortfolioInsightsDisplay() {
   const { address, isConnected } = useAccount(); // Get connected wallet address
   const [insights, setInsights] = useState<FullPortfolioInsightsResponse | null>(null);
@@ -83,12 +72,9 @@ export default function PortfolioInsightsDisplay() {
 
       setIsLoading(true);
       setError(null);
-      setInsights(null); // Clear previous insights
-
+      setInsights(null); 
       try {
-        // Ensure your Flask backend (app.py) is running on the correct port (e.g., 3001)
-        // And that it has CORS configured to allow requests from your Next.js app's origin (e.g., http://localhost:3000)
-        // Your Flask app has CORS(app, resources={r"/*": {"origins": "*"}}) which is good for local dev.
+        
         const response = await fetch(`http://localhost:3001/api/v1/portfolio/${walletAddress}/insights`);
         
         if (!response.ok) {
@@ -96,7 +82,6 @@ export default function PortfolioInsightsDisplay() {
           try {
             errorData = await response.json();
           } catch {
-            // If response is not JSON (e.g. plain text error from server)
             errorData = { detail: await response.text() };
           }
           throw new Error(errorData?.detail || errorData?.error || `HTTP error! Status: ${response.status}`);
@@ -120,11 +105,9 @@ export default function PortfolioInsightsDisplay() {
     if (isConnected && address) {
       fetchInsightsForWallet(address);
     } else {
-      // Optionally clear insights or show a "connect wallet" message if not connected
       setInsights(null); 
     }
-  }, [isConnected, address]); // Dependency array: re-fetch if connection status or address changes
-
+  }, [isConnected, address]); 
   if (!isConnected || !address) {
     return <div className="p-4 text-center">Please connect your wallet to view portfolio insights.</div>;
   }
@@ -141,14 +124,13 @@ export default function PortfolioInsightsDisplay() {
     return <div className="p-4 text-center">No insights available. Try connecting your wallet again or check back later.</div>;
   }
 
-  // --- Render the Insights Data ---
-  // This is where you'll build out the UI. Start simple.
+ 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">Portfolio Insights for {insights.requested_wallet_address}</h1>
       <p className="text-sm text-gray-500">(Data based on mock user: {insights.data_based_on_mock_user})</p>
 
-      {/* Portfolio Composition Section */}
+      {}
       <section className="p-4 border rounded-lg shadow">
         <h2 className="text-2xl font-semibold mb-3">Portfolio Composition</h2>
         <p><strong>Total Value:</strong> ${insights.portfolio_composition.total_portfolio_value?.toFixed(2)}</p>
@@ -174,8 +156,8 @@ export default function PortfolioInsightsDisplay() {
         )}
       </section>
 
-      {/* Historical Performance (using the new structure) */}
-      {insights.historical_performance_summary && (  // Change this to match your Flask response key
+      {}
+      {insights.historical_performance_summary && ( 
         <section className="p-4 border rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-3">Historical Performance</h2>
             <p>24h Change: {insights.historical_performance_summary['24h_change_percent']?.toFixed(2) ?? 'N/A'}%</p>
@@ -185,8 +167,8 @@ export default function PortfolioInsightsDisplay() {
         </section>
       )}
       
-      {/* Risk Metrics (using the new structure) */}
-      {insights.portfolio_composition.risk_metrics && ( // Assuming risk_metrics is part of portfolio_composition from Flask
+      {}
+      {insights.portfolio_composition.risk_metrics && ( 
         <section className="p-4 border rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-3">Risk Metrics (Mocked)</h2>
             <p>30d Volatility: {insights.portfolio_composition.risk_metrics.portfolio_volatility_30d?.toFixed(2) ?? 'N/A'}%</p>

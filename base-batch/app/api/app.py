@@ -11,26 +11,22 @@ from typing import Optional, List, Dict, Any
 import random
 import pymongo
 from datetime import datetime
+import json
 
-# Add mock_portfolio_insights paths
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 src_path = os.path.abspath(os.path.join(project_root, 'mock_portfolio_insights', 'src'))
 if src_path not in sys.path:
     sys.path.insert(0, src_path)
     print(f"INFO: Added {src_path} to sys.path")
 
-# Import crypto_portfolio_tool modules and config
 import crypto_portfolio_tool.config as portfolio_tool_config
 from crypto_portfolio_tool.core.models import Portfolio
-# In base-batch/app/api/app.py
-# After sys.path manipulation
+
 
 try:
     from crypto_portfolio_tool.core.exceptions import APIRequestError, LogicError, DataValidationError # << CORRECTED
-    # ... other crypto_portfolio_tool imports ...
     print("INFO (app.py): Successfully imported all crypto_portfolio_tool modules.")
 except ImportError as e:
-    # ...
     raise
 from crypto_portfolio_tool.portfolio_insights.recommendations import RecommendationEngine
 from crypto_portfolio_tool.api_clients.portfolio_api import PortfolioAPIClient
@@ -203,8 +199,7 @@ def chat_with_ai():
 
 @app.route("/api/fee-analysis", methods=["POST"])
 def analyze_fees(request: FeeAnalysisRequest):
-    # In a real app, you would calculate actual fees based on the transaction
-    # For demo purposes, we'll return mock data
+ 
     standard_fee = request.amount * 0.035  # 3.5% standard fee
     pro_fee = request.amount * 0.006  # 0.6% pro fee
     savings = standard_fee - pro_fee
@@ -241,7 +236,6 @@ def altcoin_info(request: AltcoinRequest):
             ]
         }
     elif request.action == "transfer":
-        # Guide for transferring to another exchange
         return {
             "steps": [
                 "1. Create an account on the destination exchange",
@@ -317,10 +311,9 @@ def kyc_guide():
 
 @app.route("/api/fraud-alert", methods=["POST"])
 def fraud_alert(wallet_address: Optional[str] = None):
-    # In a real app, you would analyze transaction patterns
-    # For demo purposes, we'll return mock data
+   
     return {
-        "risk_score": 65,  # 0-100, higher is more risk
+        "risk_score": 65,  
         "alerts": [
             {"type": "Large transfers detected", "severity": "high", "details": "Multiple transfers over $10,000 in the last 30 days"},
             {"type": "Multiple transactions in short time", "severity": "medium", "details": "15 transactions in 24 hours"},
@@ -447,41 +440,30 @@ async def security_check(request: SecurityCheckRequest):
 @app.route("/api/v1/portfolio/<string:wallet_address>/insights", methods=["GET"])
 def get_wallet_portfolio_insights(wallet_address: str):
     try:
-        # Map wallet address to mock user ID for testing
         user_mock_id = "user_001"
         
-        # Get enriched portfolio data
+        # Get enriched portfolio with actual mock data
         enriched_portfolio = analyzer_global.get_enriched_portfolio(user_mock_id)
+        composition_details = analyzer_global.get_portfolio_composition(user_mock_id)
+        global_sentiment = market_client_global.get_global_sentiment()
         
         response_data = {
             "requested_wallet_address": wallet_address,
-            "mock_user_id": user_mock_id,
-            "portfolio_composition": {
-                "total_value": enriched_portfolio.total_value,
-                "assets": {
-                    asset_id: {
-                        "quantity": holding.quantity,
-                        "current_price": holding.current_price,
-                        "current_value": holding.current_value
-                    }
-                    for asset_id, holding in enriched_portfolio.assets.items()
-                }
-            },
-            "performance_metrics": {
-                "24h_change": 5.2,  # Mock data
-                "7d_change": -2.1,
-                "30d_change": 15.3
-            }
+            "data_based_on_mock_user": user_mock_id,
+            "portfolio_composition": composition_details,
+            "historical_performance_summary": enriched_portfolio.historical_summary,
+            "investment_recommendations": [
+                "Diversify portfolio",
+                "Consider DCA strategy"
+            ],
+            "global_market_sentiment": global_sentiment,
+            "asset_specific_news": {}
         }
-        
+
         return jsonify(response_data), 200
 
     except Exception as e:
-        print(f"Error processing request: {str(e)}")
-        return jsonify({
-            "error": "Internal server error",
-            "detail": str(e)
-        }), 500
+        return jsonify({"error": "Internal server error", "detail": str(e)}), 500
 
 @app.route("/api/education", methods=["POST"])
 async def education_resources():
