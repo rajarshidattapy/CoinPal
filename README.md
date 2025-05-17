@@ -139,6 +139,7 @@ The backend provides the following API endpoints:
 - **AI**: OpenRouter API
 - **Blockchain**: Coinbase Wallet SDK
 
+## Demo Video: https://youtu.be/u4xDu0mQI-c
 
 ## Disclaimer
 
