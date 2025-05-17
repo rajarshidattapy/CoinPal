@@ -442,11 +442,18 @@ def get_wallet_portfolio_insights(wallet_address: str):
     try:
         user_mock_id = "user_001"
         
-        # Get enriched portfolio with actual mock data
+        # Get enriched portfolio data
         enriched_portfolio = analyzer_global.get_enriched_portfolio(user_mock_id)
         composition_details = analyzer_global.get_portfolio_composition(user_mock_id)
-        global_sentiment = market_client_global.get_global_sentiment()
-        
+
+        # Get asset-specific news for each asset
+        asset_specific_news = {}
+        for asset in composition_details.get("asset_composition", []):
+            asset_id = asset["asset_id"]
+            news_data = asset_news_client_global.get_asset_news(asset_id, limit=2)
+            if news_data and not news_data.get("error"):
+                asset_specific_news[asset_id] = news_data
+
         response_data = {
             "requested_wallet_address": wallet_address,
             "data_based_on_mock_user": user_mock_id,
@@ -456,12 +463,14 @@ def get_wallet_portfolio_insights(wallet_address: str):
                 "Diversify portfolio",
                 "Consider DCA strategy"
             ],
-            "global_market_sentiment": global_sentiment,
-            "asset_specific_news": {}
+            "global_market_sentiment": {
+                "score": 0.7,
+                "sentiment": "Bullish"
+            },
+            "asset_specific_news": asset_specific_news  # Include news data
         }
 
         return jsonify(response_data), 200
-
     except Exception as e:
         return jsonify({"error": "Internal server error", "detail": str(e)}), 500
 

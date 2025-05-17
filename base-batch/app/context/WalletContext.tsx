@@ -18,7 +18,10 @@ interface AccountType {
 
 declare global {
   interface Window {
-    ethereum: any;
+    ethereum: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+      // Add more properties/methods as needed for your use case
+    };
   }
 }
 
@@ -49,9 +52,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
-      });
+      }) as string[];
 
-      if (accounts.length === 0) {
+      if (!Array.isArray(accounts) || accounts.length === 0) {
         console.log("No authorized accounts found");
         return;
       }

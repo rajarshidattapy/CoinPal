@@ -41,7 +41,6 @@ class PortfolioAnalyzer:
         try:
             enriched_portfolio = self.get_enriched_portfolio(user_id)
             
-            # Create asset composition matching the screenshot
             composition_details = []
             if enriched_portfolio.assets:
                 for asset_id, asset in enriched_portfolio.assets.items():
@@ -53,18 +52,22 @@ class PortfolioAnalyzer:
                         "quantity": asset.quantity,
                         "current_price": asset.current_price,
                         "current_value": asset.current_value,
-                        "percentage": round(percentage, 2)
+                        "percentage": round(percentage, 2),
+                        # Add these fields for cost basis and P&L
+                        "cost_basis_total": asset.cost_basis_total,
+                        "unrealized_gain_loss_abs": asset.unrealized_pnl,
+                        "unrealized_gain_loss_percent": asset.unrealized_pnl_percent
                     })
 
-            # Calculate cash percentage
             cash_percentage = (enriched_portfolio.cash_balance / enriched_portfolio.total_value * 100) if enriched_portfolio.total_value else 100
 
             return {
+                "user_id": user_id,
+                "total_portfolio_value": round(enriched_portfolio.total_value, 2),
                 "asset_composition": composition_details,
-                "cash_balance": enriched_portfolio.cash_balance,
+                "cash_balance": round(enriched_portfolio.cash_balance, 2),
                 "cash_percentage": round(cash_percentage, 2),
-                "hhi_score": 6073.7,  # Matching the screenshot
-                "total_portfolio_value": enriched_portfolio.total_value
+                "hhi_score": self.calculate_hhi(composition_details)
             }
         except Exception as e:
             raise ValueError(f"Error in portfolio composition: {str(e)}")

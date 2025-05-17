@@ -1,52 +1,66 @@
 from flask import Flask, jsonify, request
 import json
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Construct the correct path to the data file
-# Assumes this script is in 'mock_services/' and data is in 'mock_services/mock_data/'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'mock_data', 'asset_news_sentiment.json')
 
-asset_news_data = {}
-try:
-    with open(DATA_FILE, 'r', encoding='utf-8') as f: # Added encoding
-        asset_news_data = json.load(f)
-    print(f"Successfully loaded mock news data from {DATA_FILE}")
-except FileNotFoundError:
-    print(f"ERROR: Mock data file not found at {DATA_FILE}. Service will return empty data for news.")
-except json.JSONDecodeError:
-    print(f"ERROR: Could not decode JSON from {DATA_FILE}. Service will return empty data for news.")
-except Exception as e:
-    print(f"ERROR: An unexpected error occurred loading mock news data: {e}")
-
-@app.route('/api/v1/assets/<path:asset_id>/news', methods=['GET']) # Use <path:asset_id> if asset_id can contain slashes (e.g. 'uniswap/uni')
-def get_asset_news(asset_id):
-    # Normalize asset_id (e.g., convert to uppercase if your keys are uppercase)
-    # For this example, we'll assume direct match or keys are already normalized in JSON
-    normalized_asset_id = asset_id.upper() # Example: if keys in JSON are "BTC", "ETH"
-
-    if normalized_asset_id not in asset_news_data or not asset_news_data[normalized_asset_id]:
-        return jsonify({"error": f"No news found for asset: {asset_id}"}), 404
-
-    news_list = asset_news_data[normalized_asset_id]
-
+def load_news_data():
     try:
-        limit_str = request.args.get('limit')
-        if limit_str is not None:
-            limit = int(limit_str)
-            if limit <= 0:
-                return jsonify({"error": "Limit parameter must be a positive integer."}), 400
+        with open(DATA_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading news data: {e}")
+        return {}
+
+@app.route('/api/v1/assets/<asset_id>/news', methods=['GET'])
+def get_asset_news(asset_id):
+    clean_asset_id = asset_id.split('/')[0].upper()
+    news_data = load_news_data()
+
+    if clean_asset_id not in news_data:
+        return jsonify({
+            "error": f"No news found for asset: {clean_asset_id}",
+            "asset_id": clean_asset_id,
+            "processed_news": []
+        }), 404
+
+    news_list = news_data[clean_asset_id]
+    
+    try:
+        limit = int(request.args.get('limit', 2))
+        if limit > 0:
             news_list = news_list[:limit]
     except ValueError:
-        return jsonify({"error": "Invalid limit parameter. Must be an integer."}), 400
+        return jsonify({"error": "Invalid limit parameter"}), 400
 
-    return jsonify(news_list), 200
+    processed_news = []
+    for item in news_list:
+        # Get timestamp from either published_at or timestamp field
+        timestamp = item.get("published_at") or item.get("timestamp") or datetime.now().isoformat()
+        
+        news_item = {
+            "original_headline": item["headline"],
+            "source": item["source"],
+            "timestamp": timestamp,
+            "url": item.get("url", ""),
+            "llm_summary": item["llm_processed"]["summary"],
+            "llm_sentiment_label": item["llm_processed"]["sentiment_label"],
+            "llm_analysis": item["llm_processed"]["analysis"]
+        }
+        processed_news.append(news_item)
+
+    return jsonify({
+        "asset_id": clean_asset_id,
+        "processed_news": processed_news,
+        "error": None
+    }), 200
 
 if __name__ == '__main__':
-    # Ensure this port matches your .env config for MOCK_ASSET_NEWS_SERVICE_BASE_URL
-    # Your .env specified port 5003
-    service_port = 5003 
-    print(f"Starting Asset News Mock Service on http://localhost:{service_port}")
-    app.run(debug=True, port=service_port)
+    port = int(os.environ.get("PORT", 5003))
+    print(f"Starting news service on port {port}")
+    print(f"Mock data file location: {DATA_FILE}")
+    app.run(host="0.0.0.0", port=port, debug=True)
