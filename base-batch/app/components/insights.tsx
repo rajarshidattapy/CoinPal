@@ -52,6 +52,7 @@ interface ProcessedNewsItem {
     timestamp?: string;
     llm_summary: string;
     llm_sentiment_label: string;
+    llm_analysis?: string;
 }
 
 interface AssetSpecificInsight {
@@ -59,6 +60,34 @@ interface AssetSpecificInsight {
     processed_news: ProcessedNewsItem[];
     error?: string | null;
 }
+
+const AssetNews: React.FC<{ newsData: AssetSpecificInsight }> = ({ newsData }) => {
+  return (
+    <div className="space-y-4">
+      {newsData.processed_news.map((news: ProcessedNewsItem, index: number) => (
+        <div key={index} className="bg-white p-4 rounded-lg shadow">
+          <h4 className="font-medium text-lg mb-2">{news.original_headline}</h4>
+          <div className="space-y-2 text-sm">
+            <p className="text-gray-600">{news.llm_summary}</p>
+            <p className="text-gray-700">{news.llm_analysis}</p>
+            <div className="flex justify-between items-center mt-2">
+              <span className={`px-2 py-1 rounded text-sm ${
+                news.llm_sentiment_label.includes('positive') ? 'bg-green-100 text-green-800' :
+                news.llm_sentiment_label.includes('negative') ? 'bg-red-100 text-red-800' :
+                'bg-yellow-100 text-yellow-800'
+              }`}>
+                {news.llm_sentiment_label}
+              </span>
+              <span className="text-gray-500 text-sm">
+                {news.source} • {news.timestamp ? new Date(news.timestamp).toLocaleDateString() : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function PortfolioInsightsDisplay() {
   const { address, isConnected } = useAccount(); // Get connected wallet address
@@ -201,32 +230,19 @@ export default function PortfolioInsightsDisplay() {
       )}
 
       {/* Asset Specific News Section */}
-      <section className="p-4 border rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-3">Asset-Specific News & LLM Insights</h2>
-        {insights.asset_specific_news && Object.keys(insights.asset_specific_news).length > 0 ? (
-  Object.entries(insights.asset_specific_news).map(([assetId, newsData]) => (
-    <div key={assetId} className="mb-4">
-      <h3 className="text-xl font-medium">🔹 News for {assetId}</h3>
-      {newsData.error ? (
-        <p className="text-red-400">Error fetching news: {newsData.error}</p>
-      ) : newsData.processed_news && newsData.processed_news.length > 0 ? (
-        newsData.processed_news.map((item, index) => (
-          <div key={index} className="mt-1 pl-2">
-            <p><strong>Headline:</strong> {item.original_headline}</p>
-            <p className="text-sm"><em>LLM Summary:</em> {item.llm_summary}</p>
-            <p className="text-sm"><em>LLM Sentiment:</em> [{item.llm_sentiment_label}] (Source: {item.source ?? 'N/A'})</p>
-          </div>
-        ))
-      ) : (
-        <p>No recent news processed by LLM for this asset.</p>
-      )}
-    </div>
-  ))
-) : (
-  <p>No asset-specific news available.</p>
-)}
-
-      </section>
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Asset-Specific News & LLM Insights</h2>
+        {insights?.asset_specific_news && Object.keys(insights.asset_specific_news).length > 0 ? (
+          Object.entries(insights.asset_specific_news).map(([assetId, newsData]) => (
+            <div key={assetId} className="mb-6">
+              <h3 className="text-xl font-medium mb-3">📰 {assetId} News</h3>
+              <AssetNews newsData={newsData} />
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No asset-specific news available.</p>
+        )}
+      </div>
     </div>
   );
 }

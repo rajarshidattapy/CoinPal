@@ -17,8 +17,6 @@ def get_portfolio(user_id):
         return jsonify(portfolio)
     return jsonify({"error": "User not found"}), 404
 
-# Add more endpoints later if needed (e.g., POST for transactions)
 
 if __name__ == '__main__':
-    # Port 5001 is defined in .env.example for MOCK_PORTFOLIO_SERVICE_BASE_URL
     app.run(debug=True, port=5001)

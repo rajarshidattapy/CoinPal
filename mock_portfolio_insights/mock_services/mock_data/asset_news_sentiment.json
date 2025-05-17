@@ -23,6 +23,48 @@
         "sentiment_label": "negative",
         "source": "BlockInsight",
         "timestamp": "2023-11-08T08:15:00Z"
+      },
+      {
+        "headline": "Bitcoin Surpasses $45,000 as Institutional Adoption Grows",
+        "source": "CryptoNews",
+        "timestamp": "2024-03-16T10:30:00Z",
+        "llm_processed": {
+          "summary": "Bitcoin price reaches new heights driven by increasing institutional investment.",
+          "sentiment_label": "positive",
+          "analysis": "This price movement reflects growing confidence in Bitcoin."
+        }
+      },
+      {
+        "headline": "Major Bank Announces Bitcoin Custody Services",
+        "source": "CoinDesk",
+        "timestamp": "2024-03-15T14:20:00Z",
+        "llm_processed": {
+          "summary": "Leading financial institution launches Bitcoin custody solution.",
+          "sentiment_label": "positive",
+          "analysis": "Traditional finance continues to embrace cryptocurrency."
+        }
+      },
+      {
+        "headline": "Bitcoin Tops $100,000 on U.S.–U.K. Trade Deal Optimism",
+        "source": "Reuters",
+        "published_at": "2025-05-08T14:00:00Z",
+        "url": "https://www.reuters.com/markets/currencies/bitcoin-tops-100000-trade-deal-optimism-2025-05-08/",
+        "llm_processed": {
+          "summary": "Bitcoin surged past $100,000 for the first time since February, fueled by optimism over a comprehensive U.S.–U.K. trade agreement.",
+          "sentiment_label": "very positive",
+          "analysis": "The rally underscores the sensitivity of cryptocurrency markets to geopolitical developments and trade policies."
+        }
+      },
+      {
+        "headline": "Institutional Investors Juggle Bitcoin ETF Holdings Amid Volatility",
+        "source": "Reuters",
+        "published_at": "2025-05-15T00:00:00Z",
+        "url": "https://www.reuters.com/business/institutional-investors-juggle-bitcoin-etf-holdings-us-filings-show-2025-05-15/",
+        "llm_processed": {
+          "summary": "Major asset managers adjusted their positions in spot Bitcoin ETFs in Q1 2025, with some reducing stakes and others increasing exposure.",
+          "sentiment_label": "neutral",
+          "analysis": "This rebalancing reflects strategic risk management amid recent price swings, while new entrants signal ongoing institutional interest."
+        }
       }
     ],
     "ETH": [
@@ -41,6 +83,38 @@
         "sentiment_label": "neutral",
         "source": "CoinWorld",
         "timestamp": "2023-11-09T14:00:00Z"
+      },
+      {
+        "headline": "Ethereum Network Activity Hits All-Time High",
+        "source": "ETHNews",
+        "timestamp": "2024-03-16T09:15:00Z",
+        "llm_processed": {
+          "summary": "Ethereum blockchain reaches record-breaking transaction volumes.",
+          "sentiment_label": "positive",
+          "analysis": "High network activity indicates strong ecosystem growth."
+        }
+      },
+      {
+        "headline": "ETH Surges 20% as Pectra Upgrade Restores Confidence",
+        "source": "CoinDesk",
+        "published_at": "2025-05-08T10:00:00Z",
+        "url": "https://www.coindesk.com/markets/2025/05/08/eth-surges-20-biggest-gain-since-2021-as-pectra-upgrade-helps-restore-confidence",
+        "llm_processed": {
+          "summary": "Ethereum climbed nearly 20% following the Pectra protocol upgrade, the biggest gain since 2021.",
+          "sentiment_label": "positive",
+          "analysis": "Despite the price rally, on-chain metrics show that network activity has yet to fully rebound to pre-upgrade levels."
+        }
+      },
+      {
+        "headline": "Chainproof Unveils Insurance for Ethereum Stakers Against Slashing",
+        "source": "CoinDesk",
+        "published_at": "2025-05-14T08:00:00Z",
+        "url": "https://www.coindesk.com/markets/2025/05/14/chainproof-combats-ethereum-slashing-losses-with-guaranteed-yearly-yields",
+        "llm_processed": {
+          "summary": "Chainproof launched a new product to insure Ethereum stakers against slashing and guarantee minimum annual yields.",
+          "sentiment_label": "positive",
+          "analysis": "This solution addresses growing concerns over staking risks, potentially boosting confidence among large-scale validators."
+        }
       }
     ],
     "SOL": [
@@ -70,4 +144,3 @@
       }
     ]
   }
-  

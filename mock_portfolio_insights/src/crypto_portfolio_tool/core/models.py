@@ -35,12 +35,15 @@ class AcquisitionRecord(BaseModel):
 class AssetHolding(BaseModel):
     """Represents a holding of a specific asset"""
     asset_id: str
-    name: str  # Added missing name field
+    name: str
     symbol: str
     quantity: float
-    average_buy_price: Optional[float] = None
+    average_buy_price: float
     current_price: Optional[float] = None
     current_value: Optional[float] = None
+    cost_basis_total: Optional[float] = None
+    unrealized_pnl: Optional[float] = None
+    unrealized_pnl_percent: Optional[float] = None
     last_updated: Optional[datetime] = Field(default_factory=datetime.now)
 
 class Portfolio(BaseModel):
