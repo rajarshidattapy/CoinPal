@@ -92,17 +92,22 @@ CoinPal is an AI-powered assistant that helps users navigate the challenges of u
 4. Start the backend server:
    ```
    cd backend
-   uvicorn app.main:app --reload
+   python3 app.py
    ```
 
 5. Open the application in your browser:
    ```
    http://localhost:8000
    ```
+6. Starting frontend server:
+   ```
+   cd base-batch
+   npm run dev
+   ```
 
 ## Usage
 
-1. **Connect Your Wallet**: Click the "Connect Coinbase Wallet" button to link your wallet.
+1. **Connect Your Wallet**: Click the "Connect Wallet" button to link your wallet.
 
 2. **Navigate Features**: Use the tabs at the top to access different features.
 
