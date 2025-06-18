@@ -1,4 +1,4 @@
-# CoinPal – Your Crypto Copilot
+# CoinPal – Your AI Crypto Copilot
 
 CoinPal is an AI-powered assistant that helps users navigate the challenges of using Coinbase and other cryptocurrency platforms. It provides solutions to common Coinbase demerits and enhances the overall crypto experience.
 
